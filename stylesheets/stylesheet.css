@@ -70,7 +70,7 @@ a {
 
 @media screen and (max-width: 42em) {
   .page-header {
-    padding: 2rem 1rem; } }
+    padding: .5rem .5rem; } }
 
 .project-name {
   margin-top: 0;
