@@ -5,3 +5,7 @@ input.search-query {
     margin:4px;
     /*margin is the space between boxes*/
 }
+
+.btnOut{
+  color:black;
+}
