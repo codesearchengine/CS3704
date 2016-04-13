@@ -1,11 +1,17 @@
 input.textfield {
-    background-color:#FFFFFF;
-    color:#000000;
-    width: 600px;
-    margin-bottom: 5px;
-    /*margin is the space between boxes*/
+  background-color:#FFFFFF;
+  color:#000000;
+  width: 600px;
+  margin-bottom: 5px;
+  /*margin is the space between boxes*/
 }
 
 .btnOut{
   color:black;
+}
+.V{
+  position:relative;
+  display: block;
+  margin: 0 auto;
+  text-align:center;
 }

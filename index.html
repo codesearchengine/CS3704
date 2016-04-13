@@ -40,37 +40,41 @@
     </script>
 
   </section>
-  <visualization></visualization>
+  <visualization class = "V"></visualization>
+  <script>
+
+  var dataArray = [20, 40, 50];
+  //adding SVG shapes, 1) make canvas 2) add shape
+  var canvas = d3.select("visualization")
+  .append("svg")
+  .attr("width", 1000) //note these are css elements, use attr for SVG CANVAS
+  .attr("height", 1000)
+  .attr("align","center");
+
+  //bar chat!!!!!!
+
+  var bars = canvas.selectAll("rect")
+  //bars are rectangles, since there are no rectangles on our page
+  //this variable returns an empty selection (array)
+  .data(dataArray) //binds our dataArray to an empty selection of rectangles
+  .enter() //returns a selection of  placeholders for each data element
+  .append("rect") //for each data element we append a rectangle
+  .attr("width", function(d){ return d*10;})
+  //makes width of EACH rectangle depend on the data in the array
+  //in this case each input is the output, so our rects will be of width 20, 40, 50
+  .attr("height", 50)
+  .attr("x", 10)
+  .attr("y", function(d, i) {return i*100;})
+  .text("poo")
+  .attr("fill", "red")
+    .attr("transform", "translate(0, 50)");;
+  //i = index of element, so now each bar will start below one another
+  //  .attr("y", function(d, i) {return i*100;}; //i = index of element
+  </script>
+
+
   <section class="main-content">
-    <script>
 
-    var dataArray = [20, 40, 50];
-    //adding SVG shapes, 1) make canvas 2) add shape
-    var canvas = d3.select("visualization")
-    .append("svg")
-    .attr("width", 1000) //note these are css elements, use attr for SVG CANVAS
-    .attr("height", 1000)
-    .attr("align","center");
-
-    //bar chat!!!!!!
-
-    var bars = canvas.selectAll("rect")
-    //bars are rectangles, since there are no rectangles on our page
-    //this variable returns an empty selection (array)
-    .data(dataArray) //binds our dataArray to an empty selection of rectangles
-    .enter() //returns a selection of  placeholders for each data element
-    .append("rect") //for each data element we append a rectangle
-    .attr("width", function(d){ return d*10;})
-    //makes width of EACH rectangle depend on the data in the array
-    //in this case each input is the output, so our rects will be of width 20, 40, 50
-    .attr("height", 50)
-    .attr("x", 10)
-    .attr("y", function(d, i) {return i*100;})
-    .text("poo")
-    .attr("fill", "red").attr("transform", "translate(400, 100)");;
-    //i = index of element, so now each bar will start below one another
-    //  .attr("y", function(d, i) {return i*100;}; //i = index of element
-    </script>
   </section>
 </body>
 </html>
