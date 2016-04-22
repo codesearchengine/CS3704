@@ -13,6 +13,84 @@
   <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
   <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   <link rel="stylesheet" type="text/css" href="stylesheets/widgets.css" media="screen">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  
+  <script>
+
+	var results = [];
+	var string = "";
+
+
+	function processData(data)
+	{
+		var i = 0;
+		var objUrl;
+		$.each(data.items, function(i, field){
+			$.each(field, function(key, val){
+				if(key == "text_matches")
+				{
+					var fragment;
+					var start;
+					$.each(val, function(x, y){
+						$.each(y, function(a, b){
+							if(a == "object_url")
+							{
+								objUrl = b;
+							}
+							if(a == "fragment")
+							{
+								fragment = b;
+							}
+							if(a == "matches")
+							{
+								$.each(b, function(index, object){
+									$.each(object, function(matchKey, matchValue){
+										if(matchKey == "indices")
+										{
+											start = matchValue[0];
+											results[i] = [fragment, start, objUrl];
+											i++;
+										}
+									});
+									
+								});
+							}
+						});
+					});
+				}
+			});
+		});
+		
+		for(i = 0;i<results.length;i++)
+		{
+			$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
+		}
+		
+	}
+
+	function getData(URL)
+	{
+		$.ajax({
+			url: URL,
+			headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
+			complete: function(xhr) {
+				processData(xhr.responseJSON);
+			}
+		});
+	}
+
+	function getResults()
+	{
+		var repo = $('#repo').val();
+		var query = $('#query').val();
+		
+		var URL = "https://api.github.com/search/code?q=" + query + "+repo:" + repo;
+		// for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
+		// NOTE: this url ^ won't get the text-matches since the header isn't set if you
+		//       simply access the url via a browser.  Must set header via JQuery.
+		getData(URL);
+	}
+  </script>
 
   <script src="d3.min.js" charset="utf-8"></script>
 </head>
@@ -22,10 +100,10 @@
     <h2 class="project-tagline">CS3704 Code Search Engine</h2>
 
     <form>
-      <input type="text" name="firstname" class="textfield"
+      <input type="text" name="repo" class="textfield"
       placeholder="Enter a GitHub URL">
       <br/>
-      <input type="text" name="lastname" class = "textfield"
+      <input type="text" name="query" class = "textfield"
       placeholder="Enter something to search for">
     </form>
 
@@ -35,6 +113,7 @@
     <script>
     function myFunction() {
       alert("The form was submitted");
+	  getResults();
       return false;
     }
     </script>
@@ -74,7 +153,7 @@
 
 
   <section class="main-content">
-
+	<div id="results"></div>
   </section>
 </body>
 </html>
