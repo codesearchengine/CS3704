@@ -27,6 +27,7 @@
 		var i = 0;
 		var objUrl;
 		$.each(data.items, function(i, field){
+			alert("field: " + field);
 			$.each(field, function(key, val){
 				if(key == "text_matches")
 				{
