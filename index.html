@@ -90,6 +90,12 @@
 		//       simply access the url via a browser.  Must set header via JQuery.
 		getData(URL);
 	}
+	
+	function dothings()
+	{
+		getResults();
+		event.preventDefault();
+	}
   </script>
 
   <script src="d3.min.js" charset="utf-8"></script>
@@ -109,7 +115,7 @@
 
 
     <button type="button" class = "btnOut">Visualizations</button>
-    <button type="button" class = "btnOut">Textual Results</button>
+    <button type="button" class = "btnOut"  onClick="dothings()">Textual Results</button>
     <script>
     function myFunction() {
       alert("The form was submitted");
