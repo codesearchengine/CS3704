@@ -81,7 +81,7 @@
 			url: URL,
 			headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
 			complete: function(xhr) {
-				alert(xhr.responseJSON);
+				alert(xhr.responseText);
 				$("#results").append(xhr.responseJSON);
 				processData(xhr.responseJSON);
 			}
