@@ -23,6 +23,7 @@
 
 	function processData(data)
 	{
+		alert("processData()");
 		var i = 0;
 		var objUrl;
 		$.each(data.items, function(i, field){
@@ -70,6 +71,7 @@
 
 	function getData(URL)
 	{
+		alert("getData()");
 		$.ajax({
 			url: URL,
 			headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
@@ -81,6 +83,7 @@
 
 	function getResults()
 	{
+		alert("getResults()");
 		var repo = $('#repo').val();
 		var query = $('#query').val();
 		
@@ -93,6 +96,7 @@
 	
 	function dothings()
 	{
+		alert("dothings()");
 		getResults();
 		event.preventDefault();
 	}
