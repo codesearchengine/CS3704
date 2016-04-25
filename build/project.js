@@ -530,11 +530,11 @@ var max;
 function findMax()
 {
   max = -1;
-  for (i = 0; i < results.length; i++)
+  for (result of results.results)
   {
-    if (results[i][1] > max)
+    if (result.getMatchPosition() > max)
     {
-      max = results[i][1];
+      max = result.getMatchPosition();
     }
   }
 }
@@ -598,12 +598,12 @@ function barCharts()
 //Pie Charts
 function piCharts()
 {
-  var data = new Array(results.length); //need to be this size for for loop below
+  var data = new Array(results.results.length); //need to be this size for for loop below
 
-  for (i = 0; i < results.length; i++)
+  for (i = 0; i < results.results.length; i++)
   {
     // console.log(results[i][1])
-    data[i] = results[i][1];
+    data[i] = results.get(i).getMatchPosition();
   }
 
   var r = 200;
