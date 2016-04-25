@@ -9,17 +9,19 @@ function visualize()
   piCharts();
 }
 
-var max;
-function findMax()
+
+function findMax(arr, le)
 {
+  var max;
   max = -1;
-  for (i = 0; i < results.length; i++)
+  for (i = 0; i < le; i++)
   {
-    if (results[i][1] > max)
+    if (arr[i][1] > max)
     {
-      max = results[i][1];
+      max = arr[i][1];
     }
   }
+  return max;
 }
 
 function clearCanvas()
@@ -47,7 +49,9 @@ function barCharts()
 
   var dataArray = results;
   //(num results * rectheight + numresults*yPosScale) + overhead
-  rectCanvasHeight = results.length*(rectHeight + yPosScale)  ;
+  rectCanvasHeight = results.length*(rectHeight + yPosScale);
+  // console.log('in bar' + results.length);
+  var max = findMax(results, results.length);
   rectCanvasWidth = max*rectWidthScale + max * rectWidthScale * .5;
 
   //adding SVG shapes, 1) make canvas 2) add shape
@@ -81,6 +85,7 @@ function barCharts()
 //Pie Charts
 function piCharts()
 {
+  var max = findMax(results, results.length);
   var data = new Array(results.length); //need to be this size for for loop below
 
   for (i = 0; i < results.length; i++)
