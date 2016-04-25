@@ -23,16 +23,12 @@
 
 	function processData(data)
 	{
-		alert("data: " + data);
-		alert("processData()");
 		var i = 0;
 		var objUrl;
 		$.each(data.items, function(i, field){
-			alert("field: " + field);
 			$.each(field, function(key, val){
 				if(key == "text_matches")
 				{
-					alert("got a text match");
 				
 					var fragment;
 					var start;
@@ -66,7 +62,6 @@
 			});
 		});
 		
-		alert("num results" + results.length);
 		for(i = 0;i<results.length;i++)
 		{
 			$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
@@ -76,12 +71,10 @@
 
 	function getData(URL)
 	{
-		alert("getData()");
 		$.ajax({
 			url: URL,
 			headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
 			complete: function(xhr) {
-				alert(xhr.responseText);
 				processData(xhr.responseJSON);
 			}
 		});
@@ -89,7 +82,6 @@
 
 	function getResults()
 	{
-		alert("getResults()");
 		var repo = $('#repo').val();
 		var query = $('#query').val();
 		
@@ -97,13 +89,12 @@
 		// for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
 		// NOTE: this url ^ won't get the text-matches since the header isn't set if you
 		//       simply access the url via a browser.  Must set header via JQuery.
-		console.log(URL);
+		//console.log(URL);
 		getData(URL);
 	}
 	
 	function dothings()
 	{
-		alert("dothings()");
 		getResults();
 		event.preventDefault();
 	}
