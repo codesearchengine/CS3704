@@ -27,6 +27,12 @@
 
 	function processData(data)
 	{
+		results = [];
+		string = "";
+		issueCount = 0;
+		issueCommentCount = 0;
+		fileContentCount = 0;
+	
 		var i = 0;
 		var objUrl;
 		$.each(data.items, function(i, field){
