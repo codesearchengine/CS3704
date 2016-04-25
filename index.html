@@ -19,6 +19,7 @@
 
 	var results = [];
 	var string = "";
+	var query;
 
 
 	function processData(data)
@@ -64,7 +65,9 @@
 		
 		for(i = 0;i<results.length;i++)
 		{
-			$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
+			//$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
+			var formattedString = results[i][0].substring(0, results[i][1]) + "<b>" + results[i][0].substring(results[i][1], results[i][1] + "</b>" + query.length) + results[i][0].substring(results[i][1] + query.length, results[i][0].length);
+			$("#results").append(formattedString);
 		}
 		
 	}
@@ -83,7 +86,7 @@
 	function getResults()
 	{
 		var repo = $('#repo').val();
-		var query = $('#query').val();
+		query = $('#query').val();
 		
 		var URL = "https://api.github.com/search/code?q=" + query + "+repo:" + repo;
 		// for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
