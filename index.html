@@ -186,8 +186,8 @@
     var rectCanvas = d3.select("visualization")
     .append("svg")
     .attr("width", 1000) //note these are css elements, use attr for SVG CANVAS
-    .attr("height", rectCanvasHeight)
-    .attr("align","center");
+    .attr("height", rectCanvasHeight);
+    //.attr("align","center");
 
     //bar chat!!!!!!
 
@@ -269,7 +269,7 @@
     //d[1].data vs d[1]??? TODO -----------------
 
     //moving the whole thing to a position:
-    arcs.attr("transform", "translate(0, 0)"); 
+    arcs.attr("transform", "translate(0, 0)");
 
     //appending text to each arc
     arcs.append("text")
