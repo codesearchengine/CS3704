@@ -20,6 +20,9 @@
 	var results = [];
 	var string = "";
 	var query;
+	var issueCount = 0;
+	var issueCommentCount = 0;
+	var fileContentsCount = 0;
 
 
 	function processData(data)
@@ -38,6 +41,23 @@
 							if(a == "object_url")
 							{
 								objUrl = b;
+							}
+							if(a == "object_type")
+							{
+								switch(b)
+								{
+									case "Issue":
+										issueCount++;
+										break;
+									case "IssueComment":
+										issueCommentCount++;
+										break;
+									case "FileContents":
+										fileContentsCount++;
+										break;
+									default:
+										alert(b);
+								}
 							}
 							if(a == "fragment")
 							{
