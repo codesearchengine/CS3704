@@ -145,13 +145,31 @@
     <button type="button" class = "btnOut"  onClick="dothings()">Textual Results</button>
     <button type="button" class = "btnOut"  onClick="clearCanvas()">clearCanvas</button>
   </section>
-  <visualization class = "V"></visualization>
+  <visualization class = "V" id ="V" style = "display: none;"><p>
+    Visuals:
+  </p></visualization>
   <script>
   function visualize()
   {
+    findMax();
     clearCanvas();
+    $("#V").fadeOut(1);
+    $("#V").fadeIn(1500);
     barCharts();
     piCharts();
+  }
+
+  var max;
+  function findMax()
+  {
+    max = -1;
+    for (i = 0; i < results.length; i++)
+    {
+      if (results[i][1] > max)
+      {
+        max = results[i][1];
+      }
+    }
   }
 
   function clearCanvas()
@@ -162,15 +180,15 @@
     d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
   }
 
-  var rectCanvasHeight; //global so you can output in console
-  var rectCanvas;
+
 
   function barCharts()
   {
     //alert('in barCharts()!');
     //var dataArray = [20, 40, 50];
     //  var dataArray = [20, 10];
-
+    var rectCanvasHeight; //global so you can output in console
+    var rectCanvas;
     var rectWidthScale = 10;
     var rectHeight = 25;
     var yPosScale = 50; //index * yPosScale ...to represent spacing between rects
@@ -180,12 +198,12 @@
     var dataArray = results;
     //(num results * rectheight + numresults*yPosScale) + overhead
     rectCanvasHeight = results.length*(rectHeight + yPosScale)  ;
-
+    rectCanvasWidth = max*rectWidthScale + max * rectWidthScale * .5;
 
     //adding SVG shapes, 1) make canvas 2) add shape
     var rectCanvas = d3.select("visualization")
     .append("svg")
-    .attr("width", 1000) //note these are css elements, use attr for SVG CANVAS
+    .attr("width", rectCanvasWidth) //note these are css elements, use attr for SVG CANVAS
     .attr("height", rectCanvasHeight)
     .attr("align","center");
 
@@ -209,13 +227,11 @@
     //i = index of element, so now each bar will start below one another
     //  .attr("y", function(d, i) {return i*100;}; //i = index of element}
   }
-  var data = new Array(results.length); //need to be this size for for loop below
-  //var data = [];
+
+  //Pie Charts
   function piCharts()
   {
-    // var data = [10, 50, 80]; //Original
-    //var data = [33, 24, 38]; //results from searching "c"
-    //var data = results;
+    var data = new Array(results.length); //need to be this size for for loop below
 
     for (i = 0; i < results.length; i++)
     {
@@ -225,15 +241,18 @@
 
     var r = 200;
 
+
     //oridinal means the input might not be a continious domain
-    var color = d3.scale.ordinal().range(["red", "blue", "orange"]);
+    var color = d3.scale.ordinal()
+    .domain([0, max*2]) //*2 to scale better
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
     var canvas = d3.select("visualization").append("svg") //TODO: visualization or body?
-    .attr("width", 700)
-    .attr("height", 700);
+    .attr("width", 410)
+    .attr("height", 410);
 
     var group = canvas.append("g")
-    .attr("transform", "translate(300, 300)");
+    .attr("transform", "translate(200, 200)");
 
 
     //Donut chart code:
@@ -276,7 +295,7 @@
     .attr("transform", function(d){ return "translate(" + arc.centroid(d) +")";})
     //centroid returns the center of each arc in our data
     .attr("text-anchor", "middle") //centers it better
-    .attr("font-size", "1.5em")
+    .attr("font-size", ".6em")
     .text(function(d){ return d.data;});
   }
   </script>
