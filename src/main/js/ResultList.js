@@ -1,5 +1,6 @@
 var ResultList = function() {
     this.results = [];
+    this.query = undefined;
 }
 
 ResultList.prototype.clear = function() {
@@ -30,9 +31,22 @@ ResultList.prototype.get = function(index) {
     return this.results[index];
 }
 
+ResultList.prototype.getQuery = function() {
+    return this.query;
+}
+
+ResultList.prototype.setQuery = function(query) {
+    this.query = query;
+}
+
 ResultList.prototype.parse = function(json) {
+    this.results = [];
     try {
-        this.results = JSON.parse(json);
+        var temp = JSON.parse(json);
+        for(item of temp.results) {
+            this.results.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
+        }
+        this.query = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
     }
     catch (SyntaxError) {
         alert("File could not be parsed as a valid result set.");

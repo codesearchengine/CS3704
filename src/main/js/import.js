@@ -8,13 +8,14 @@ var fileSelectChange = function(evnt) {
     }
 }
 
-var checkResults = function() {
-    alert(JSON.stringify(results.results));
+var importResults = function() {
+	$("#fileSelect").trigger('click');
 }
 
 var parseText = function(evnt) {
     results.parse(reader.result);
+    showResultSet();
 };
 
 reader.onload = parseText;
-document.getElementById("fileSelect").addEventListener("change", fileSelectChange, false);
+$("#fileSelect")[0].addEventListener("change", fileSelectChange, false);

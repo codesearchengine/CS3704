@@ -366,6 +366,7 @@ Result.prototype.matches = function(param, value) {
 }
 var ResultList = function() {
     this.results = [];
+    this.query = undefined;
 }
 
 ResultList.prototype.clear = function() {
@@ -396,9 +397,22 @@ ResultList.prototype.get = function(index) {
     return this.results[index];
 }
 
+ResultList.prototype.getQuery = function() {
+    return this.query;
+}
+
+ResultList.prototype.setQuery = function(query) {
+    this.query = query;
+}
+
 ResultList.prototype.parse = function(json) {
+    this.results = [];
     try {
-        this.results = JSON.parse(json);
+        var temp = JSON.parse(json);
+        for(item of temp.results) {
+            this.results.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
+        }
+        this.query = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
     }
     catch (SyntaxError) {
         alert("File could not be parsed as a valid result set.");
@@ -406,7 +420,6 @@ ResultList.prototype.parse = function(json) {
 }
 
 var results = new ResultList();
-var query = new Query();
 var issueCount = 0;
 var issueCommentCount = 0;
 var fileContentCount = 0;
@@ -460,11 +473,15 @@ function processData(data)
             }
         });
     });
+    showResultSet();
+}
 
+function showResultSet() {
     $("#results").empty();
     alert(JSON.stringify(results, null, 2));
     for(i = 0;i<results.results.length;i++) {
         var result = results.get(i);
+        var query = results.getQuery();
         var position = result.getMatchPosition();
         var formattedString = result.getTextValue().substring(0, position) + "<b>" + 
             result.getTextValue().substring(position, position + query.getQuery().length) + 
@@ -485,9 +502,8 @@ function getData(URL) {
 }
 
 function getResults() {
-    query.setRepo($('#repo').val());
-    query.setQuery($('#query').val());
-    alert(JSON.stringify(query.getQuery()));
+    var query = new Query().setRepo($('#repo').val()).setQuery($('#query').val());
+    results.setQuery(query);
     var URL = "https://api.github.com/search/code?q=" + query.getQuery() + "+repo:" + query.getRepo();
     // for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
     // NOTE: this url ^ won't get the text-matches since the header isn't set if you
@@ -660,18 +676,19 @@ var fileSelectChange = function(evnt) {
     }
 }
 
-var checkResults = function() {
-    alert(JSON.stringify(results.results));
+var importResults = function() {
+	$("#fileSelect").trigger('click');
 }
 
 var parseText = function(evnt) {
     results.parse(reader.result);
+    showResultSet();
 };
 
 reader.onload = parseText;
-document.getElementById("fileSelect").addEventListener("change", fileSelectChange, false);
+$("#fileSelect")[0].addEventListener("change", fileSelectChange, false);
 
-var makeFile = function() {
-    var blob = new Blob([JSON.stringify(results.results, null, 2)], {type: "application/json"});
+var exportResults = function() {
+    var blob = new Blob([JSON.stringify(results, null, 2)], {type: "application/json"});
     saveAs(blob, "resultSet.json");
 }

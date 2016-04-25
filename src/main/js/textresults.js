@@ -1,5 +1,4 @@
 var results = new ResultList();
-var query = new Query();
 var issueCount = 0;
 var issueCommentCount = 0;
 var fileContentCount = 0;
@@ -53,11 +52,15 @@ function processData(data)
             }
         });
     });
+    showResultSet();
+}
 
+function showResultSet() {
     $("#results").empty();
     alert(JSON.stringify(results, null, 2));
     for(i = 0;i<results.results.length;i++) {
         var result = results.get(i);
+        var query = results.getQuery();
         var position = result.getMatchPosition();
         var formattedString = result.getTextValue().substring(0, position) + "<b>" + 
             result.getTextValue().substring(position, position + query.getQuery().length) + 
@@ -78,9 +81,8 @@ function getData(URL) {
 }
 
 function getResults() {
-    query.setRepo($('#repo').val());
-    query.setQuery($('#query').val());
-    alert(JSON.stringify(query.getQuery()));
+    var query = new Query().setRepo($('#repo').val()).setQuery($('#query').val());
+    results.setQuery(query);
     var URL = "https://api.github.com/search/code?q=" + query.getQuery() + "+repo:" + query.getRepo();
     // for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
     // NOTE: this url ^ won't get the text-matches since the header isn't set if you

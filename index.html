@@ -17,115 +17,10 @@
 
   <script>
 
-  var results = [];
-  var string = "";
-  var query;
-  var issueCount = 0;
-  var issueCommentCount = 0;
-  var fileContentCount = 0;
 
-
-  function processData(data)
-  {
-    var i = 0;
-    var objUrl;
-    $.each(data.items, function(i, field){
-      $.each(field, function(key, val){
-        if(key == "text_matches")
-        {
-
-          var fragment;
-          var start;
-          $.each(val, function(x, y){
-            $.each(y, function(a, b){
-              if(a == "object_url")
-              {
-                objUrl = b;
-              }
-              if(a == "object_type")
-              {
-                switch(b)
-                {
-                  case "Issue":
-                  issueCount++;
-                  break;
-                  case "IssueComment":
-                  issueCommentCount++;
-                  break;
-                  case "FileContent":
-                  fileContentCount++;
-                  break;
-                }
-              }
-              if(a == "fragment")
-              {
-                fragment = b;
-              }
-              if(a == "matches")
-              {
-                $.each(b, function(index, object){
-                  $.each(object, function(matchKey, matchValue){
-                    if(matchKey == "indices")
-                    {
-                      start = matchValue[0];
-                      results[i] = [fragment, start, objUrl];
-                      i++;
-                    }
-                  });
-
-                });
-              }
-            });
-          });
-        }
-      });
-    });
-
-    //alert("Issue Count: " + issueCount);
-    //alert("IssueComment Count: " + issueCommentCount);
-    //alert("FileContent Count: " + fileContentCount);
-
-    for(i = 0;i<results.length;i++)
-    {
-      //$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
-      var formattedString = results[i][0].substring(0, results[i][1]) + "<b>" + results[i][0].substring(results[i][1], results[i][1] + query.length) + "</b>" + results[i][0].substring(results[i][1] + query.length, results[i][0].length) + "<br><br>";
-      $("#results").append(formattedString);
-    }
-
-  }
-
-  function getData(URL)
-  {
-    $.ajax({
-      url: URL,
-      headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
-      complete: function(xhr) {
-        processData(xhr.responseJSON);
-      }
-    });
-  }
-
-  function getResults()
-  {
-    var repo = $('#repo').val();
-    query = $('#query').val();
-
-    var URL = "https://api.github.com/search/code?q=" + query + "+repo:" + repo;
-    // for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
-    // NOTE: this url ^ won't get the text-matches since the header isn't set if you
-    //       simply access the url via a browser.  Must set header via JQuery.
-    //console.log(URL);
-    getData(URL);
-  }
-
-  function dothings()
-  {
-    getResults();
-    event.preventDefault();
-  }
   </script>
 
-  <script src="d3.min.js" charset="utf-8"></script>
+  <script src="src/main/js/d3.min.js" charset="utf-8"></script>
 </head>
 <body>
   <section class="page-header">
@@ -142,19 +37,21 @@
 
 
     <button type="button" class = "btnOut" onClick="visualize()">Visualizations</button>
-    <button type="button" class = "btnOut"  onClick="dothings()">Textual Results</button>
-    <button type="button" class = "btnOut"  onClick="clearCanvas()">clearCanvas</button>
+    <button type="button" class = "btnOut" onClick="dothings()">Textual Results</button>
+    <button type="button" class = "btnOut" onClick="clearCanvas()">clearCanvas</button>
+    <button type="button" class = "btnOut" onClick="exportResults()">Export Results</button>
+    <button type="button" class = "btnOut" onClick="importResults()">Import Result Set</button>
+    <input type="file" id="fileSelect" style="display: none;"></input>
   </section>
   <visualization class = "V" id ="V" style = "display: none;"><p>
     Visuals:
   </p></visualization>
-  <script src = "visualize.js">
-
-  </script>
-
 
   <section class="main-content">
     <div id="results"></div>
   </section>
+
+  <script src = "build/project.js"></script>
+
 </body>
 </html>
