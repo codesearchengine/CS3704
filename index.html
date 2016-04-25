@@ -22,7 +22,7 @@
 	var query;
 	var issueCount = 0;
 	var issueCommentCount = 0;
-	var fileContentsCount = 0;
+	var fileContentCount = 0;
 
 
 	function processData(data)
@@ -52,8 +52,8 @@
 									case "IssueComment":
 										issueCommentCount++;
 										break;
-									case "FileContents":
-										fileContentsCount++;
+									case "FileContent":
+										fileContentCount++;
 										break;
 									default:
 										alert(b);
@@ -85,7 +85,7 @@
 		
 		alert("Issue Count: " + issueCount);
 		alert("IssueComment Count: " + issueCommentCount);
-		alert("FileContents Count: " + fileContentsCountCount);
+		alert("FileContent Count: " + fileContentCount);
 		
 		for(i = 0;i<results.length;i++)
 		{
