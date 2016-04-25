@@ -82,7 +82,6 @@
 			headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
 			complete: function(xhr) {
 				alert(xhr.responseText);
-				$("#results").append(xhr.responseJSON);
 				processData(xhr.responseJSON);
 			}
 		});
@@ -127,13 +126,6 @@
 
     <button type="button" class = "btnOut">Visualizations</button>
     <button type="button" class = "btnOut"  onClick="dothings()">Textual Results</button>
-    <script>
-    function myFunction() {
-      alert("The form was submitted");
-	  getResults();
-      return false;
-    }
-    </script>
 
   </section>
   <visualization class = "V"></visualization>
