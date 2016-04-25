@@ -14,115 +14,115 @@
   <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   <link rel="stylesheet" type="text/css" href="stylesheets/widgets.css" media="screen">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-  
+
   <script>
 
-	var results = [];
-	var string = "";
-	var query;
-	var issueCount = 0;
-	var issueCommentCount = 0;
-	var fileContentCount = 0;
+  var results = [];
+  var string = "";
+  var query;
+  var issueCount = 0;
+  var issueCommentCount = 0;
+  var fileContentCount = 0;
 
 
-	function processData(data)
-	{
-		var i = 0;
-		var objUrl;
-		$.each(data.items, function(i, field){
-			$.each(field, function(key, val){
-				if(key == "text_matches")
-				{
-				
-					var fragment;
-					var start;
-					$.each(val, function(x, y){
-						$.each(y, function(a, b){
-							if(a == "object_url")
-							{
-								objUrl = b;
-							}
-							if(a == "object_type")
-							{
-								switch(b)
-								{
-									case "Issue":
-										issueCount++;
-										break;
-									case "IssueComment":
-										issueCommentCount++;
-										break;
-									case "FileContent":
-										fileContentCount++;
-										break;
-								}
-							}
-							if(a == "fragment")
-							{
-								fragment = b;
-							}
-							if(a == "matches")
-							{
-								$.each(b, function(index, object){
-									$.each(object, function(matchKey, matchValue){
-										if(matchKey == "indices")
-										{
-											start = matchValue[0];
-											results[i] = [fragment, start, objUrl];
-											i++;
-										}
-									});
-									
-								});
-							}
-						});
-					});
-				}
-			});
-		});
-		
-		//alert("Issue Count: " + issueCount);
-		//alert("IssueComment Count: " + issueCommentCount);
-		//alert("FileContent Count: " + fileContentCount);
-		
-		for(i = 0;i<results.length;i++)
-		{
-			//$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
-			var formattedString = results[i][0].substring(0, results[i][1]) + "<b>" + results[i][0].substring(results[i][1], results[i][1] + query.length) + "</b>" + results[i][0].substring(results[i][1] + query.length, results[i][0].length) + "<br><br>";
-			$("#results").append(formattedString);
-		}
-		
-	}
+  function processData(data)
+  {
+    var i = 0;
+    var objUrl;
+    $.each(data.items, function(i, field){
+      $.each(field, function(key, val){
+        if(key == "text_matches")
+        {
 
-	function getData(URL)
-	{
-		$.ajax({
-			url: URL,
-			headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
-			complete: function(xhr) {
-				processData(xhr.responseJSON);
-			}
-		});
-	}
+          var fragment;
+          var start;
+          $.each(val, function(x, y){
+            $.each(y, function(a, b){
+              if(a == "object_url")
+              {
+                objUrl = b;
+              }
+              if(a == "object_type")
+              {
+                switch(b)
+                {
+                  case "Issue":
+                  issueCount++;
+                  break;
+                  case "IssueComment":
+                  issueCommentCount++;
+                  break;
+                  case "FileContent":
+                  fileContentCount++;
+                  break;
+                }
+              }
+              if(a == "fragment")
+              {
+                fragment = b;
+              }
+              if(a == "matches")
+              {
+                $.each(b, function(index, object){
+                  $.each(object, function(matchKey, matchValue){
+                    if(matchKey == "indices")
+                    {
+                      start = matchValue[0];
+                      results[i] = [fragment, start, objUrl];
+                      i++;
+                    }
+                  });
 
-	function getResults()
-	{
-		var repo = $('#repo').val();
-		query = $('#query').val();
-		
-		var URL = "https://api.github.com/search/code?q=" + query + "+repo:" + repo;
-		// for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
-		// NOTE: this url ^ won't get the text-matches since the header isn't set if you
-		//       simply access the url via a browser.  Must set header via JQuery.
-		//console.log(URL);
-		getData(URL);
-	}
-	
-	function dothings()
-	{
-		getResults();
-		event.preventDefault();
-	}
+                });
+              }
+            });
+          });
+        }
+      });
+    });
+
+    //alert("Issue Count: " + issueCount);
+    //alert("IssueComment Count: " + issueCommentCount);
+    //alert("FileContent Count: " + fileContentCount);
+
+    for(i = 0;i<results.length;i++)
+    {
+      //$("#results").append("Matching String: "+ results[i][0] + "<br>Starting Index: "+ results[i][1] + "<br>File Url: "+ results[i][2] + "<br><br>");
+      var formattedString = results[i][0].substring(0, results[i][1]) + "<b>" + results[i][0].substring(results[i][1], results[i][1] + query.length) + "</b>" + results[i][0].substring(results[i][1] + query.length, results[i][0].length) + "<br><br>";
+      $("#results").append(formattedString);
+    }
+
+  }
+
+  function getData(URL)
+  {
+    $.ajax({
+      url: URL,
+      headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
+      complete: function(xhr) {
+        processData(xhr.responseJSON);
+      }
+    });
+  }
+
+  function getResults()
+  {
+    var repo = $('#repo').val();
+    query = $('#query').val();
+
+    var URL = "https://api.github.com/search/code?q=" + query + "+repo:" + repo;
+    // for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
+    // NOTE: this url ^ won't get the text-matches since the header isn't set if you
+    //       simply access the url via a browser.  Must set header via JQuery.
+    //console.log(URL);
+    getData(URL);
+  }
+
+  function dothings()
+  {
+    getResults();
+    event.preventDefault();
+  }
   </script>
 
   <script src="d3.min.js" charset="utf-8"></script>
@@ -141,45 +141,140 @@
     </form>
 
 
-    <button type="button" class = "btnOut">Visualizations</button>
+    <button type="button" class = "btnOut" onClick="visualize()">Visualizations</button>
     <button type="button" class = "btnOut"  onClick="dothings()">Textual Results</button>
-
+    <button type="button" class = "btnOut"  onClick="clearCanvas()">clearCanvas</button>
   </section>
   <visualization class = "V"></visualization>
   <script>
+  function visualize()
+  {
+    clearCanvas();
+    barCharts();
+    piCharts();
+  }
 
-  var dataArray = [20, 40, 50];
-  //adding SVG shapes, 1) make canvas 2) add shape
-  var canvas = d3.select("visualization")
-  .append("svg")
-  .attr("width", 1000) //note these are css elements, use attr for SVG CANVAS
-  .attr("height", 1000)
-  .attr("align","center");
+  function clearCanvas()
+  {
+      //Remove : do for as many times you generate charts
+      //  rectCanvas = ""; //to prevent old rectangles from living...search script then head
+        d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
+        d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
+  }
 
-  //bar chat!!!!!!
+  var rectCanvasHeight; //global so you can output in console
+  var rectCanvas;
 
-  var bars = canvas.selectAll("rect")
-  //bars are rectangles, since there are no rectangles on our page
-  //this variable returns an empty selection (array)
-  .data(dataArray) //binds our dataArray to an empty selection of rectangles
-  .enter() //returns a selection of  placeholders for each data element
-  .append("rect") //for each data element we append a rectangle
-  .attr("width", function(d){ return d*10;})
-  //makes width of EACH rectangle depend on the data in the array
-  //in this case each input is the output, so our rects will be of width 20, 40, 50
-  .attr("height", 50)
-  .attr("x", 10)
-  .attr("y", function(d, i) {return i*100;})
-  .text("poo")
-  .attr("fill", "red")
-    .attr("transform", "translate(0, 50)");;
-  //i = index of element, so now each bar will start below one another
-  //  .attr("y", function(d, i) {return i*100;}; //i = index of element
+  function barCharts()
+  {
+    //alert('in barCharts()!');
+    //var dataArray = [20, 40, 50];
+    //  var dataArray = [20, 10];
+
+    var rectWidthScale = 10;
+    var rectHeight = 25;
+    var yPosScale = 50; //index * yPosScale ...to represent spacing between rects
+    var indexNumericalData = 1;
+
+
+    var dataArray = results;
+     //(num results * rectheight + numresults*yPosScale) + overhead
+    rectCanvasHeight = results.length*(rectHeight + yPosScale)  ;
+
+
+    //adding SVG shapes, 1) make canvas 2) add shape
+    var rectCanvas = d3.select("visualization")
+    .append("svg")
+    .attr("width", 1000) //note these are css elements, use attr for SVG CANVAS
+    .attr("height", rectCanvasHeight)
+    .attr("align","center");
+
+    //bar chat!!!!!!
+
+    var bars = rectCanvas.selectAll("rect")
+    //bars are rectangles, since there are no rectangles on our page
+    //this variable returns an empty selection (array)
+    .data(dataArray) //binds our dataArray to an empty selection of rectangles
+    .enter() //returns a selection of  placeholders for each data element
+    .append("rect") //for each data element we append a rectangle
+    .attr("width", function(d){ return d[indexNumericalData]*rectWidthScale;})
+    //makes width of EACH rectangle depend on the data in the array
+    //in this case each input is the output, so our rects will be of width 20, 40, 50
+    .attr("height", rectHeight)
+    .attr("x", 10)
+    .attr("y", function(d, i) {return i*yPosScale;})
+    .text("poo")
+    .attr("fill", "red")
+    .attr("transform", "translate(0, 50)")
+    //i = index of element, so now each bar will start below one another
+    //  .attr("y", function(d, i) {return i*100;}; //i = index of element}
+  }
+
+  function piCharts()
+  {
+    // var data = [10, 50, 80]; //Original
+    //  var data = [33, 24, 38]; //results from searching "c"
+       //var data = results;
+     var r = 300;
+  var indexNumericalData = 1;
+//oridinal means the input might not be a continious domain
+    var color = d3.scale.ordinal().range(["red", "blue", "orange"]);
+
+    var canvas = d3.select("visualization").append("svg") //TODO: visualization or body?
+    .attr("width", 700)
+    .attr("height", 700)
+    .attr("x", 0);
+
+    var group = canvas.append("g")
+    .attr("transform", "translate(300, 300)");
+
+
+  //Donut chart code:
+    // var arc = d3.svg.arc() //arc path generator (see tutorial 12)
+    // .innerRadius(r-100)
+    // .outerRadius(r);
+
+  //Pie chart code:
+  var arc = d3.svg.arc() //arc path generator (see tutorial 12)
+  .innerRadius(0)
+  .outerRadius(r);
+
+    //to invoke pie we do pie()
+    var pie = d3.layout.pie()
+    .value(function(d){ return d;});
+
+    var arcs = group.selectAll(".arc") //select everything that is of class "arc"
+    .data(pie(data)) //bind our data to the selection,
+    // but pass it through the pie layout (returns an object with start and end angle)
+    .enter() //so we don't need a for loop
+    //Returns the enter selection: placeholder nodes for each data element for
+    //which no corresponding existing DOM element was found in the current selection
+    .append("g") //appends group for each data element
+    .attr("class", "arc"); //see notes at 1) for what happens at this point in the console...
+    //each data element has had an arc path generated
+
+
+    arcs.append("path") //appends a path to each data element
+    .attr("d", arc)
+    //d  being an element in the array
+    // will fetch the path data from the arc path generator (inner and outer radius)
+    //and the arc generator will also get the start and end angle from .data(pie(data))
+    .attr("fill", function(d){ return color(d.data);}); //d.data being the value of the array element
+    //d[1].data vs d[1]??? TODO -----------------
+
+  //appending text to each arc
+    arcs.append("text")
+    .attr("transform", function(d){ return "translate(" + arc.centroid(d) +")";})
+    //centroid returns the center of each arc in our data
+    .attr("text-anchor", "middle") //centers it better
+    .attr("font-size", "1.5em")
+    .text(function(d){ return d.data;});
+  }
   </script>
 
 
   <section class="main-content">
-	<div id="results"></div>
+    <div id="results"></div>
   </section>
 </body>
 </html>
