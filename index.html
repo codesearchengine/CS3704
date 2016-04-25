@@ -14,6 +14,7 @@
   <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   <link rel="stylesheet" type="text/css" href="stylesheets/widgets.css" media="screen">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <script src="d3.min.js" charset="utf-8"></script>
 
   <script>
 
@@ -125,7 +126,6 @@
   }
   </script>
 
-  <script src="d3.min.js" charset="utf-8"></script>
 </head>
 <body>
   <section class="page-header">
@@ -140,18 +140,17 @@
       placeholder="Enter something to search for">
     </form>
 
-
     <button type="button" class = "btnOut" onClick="visualize()">Visualizations</button>
     <button type="button" class = "btnOut"  onClick="dothings()">Textual Results</button>
     <button type="button" class = "btnOut"  onClick="clearCanvas()">clearCanvas</button>
   </section>
+
   <visualization class = "V" id ="V" style = "display: none;"><p>
     Visuals:
   </p></visualization>
+
   <script src = "visualize.js">
-
   </script>
-
 
   <section class="main-content">
     <div id="results"></div>
