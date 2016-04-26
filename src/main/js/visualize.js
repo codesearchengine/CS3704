@@ -1,7 +1,6 @@
-
 function visualize()
 {
-  findMax();
+  findMax(results.results);
   clearCanvas();
   $("#V").fadeOut(1);
   $("#V").fadeIn(1500);
@@ -9,17 +8,18 @@ function visualize()
   piCharts();
 }
 
-var max;
-function findMax()
+
+function findMax(results)
 {
-  max = -1;
-  for (result of results.results)
+  var max = -1;
+  for (item of results)
   {
-    if (result.getMatchPosition() > max)
+    if (item.getMatchPosition() > max)
     {
-      max = result.getMatchPosition();
+      max = item.getMatchPosition();
     }
   }
+  return max;
 }
 
 function clearCanvas()
@@ -42,12 +42,11 @@ function barCharts()
   var rectWidthScale = 10;
   var rectHeight = 25;
   var yPosScale = 50; //index * yPosScale ...to represent spacing between rects
-  var indexNumericalData = 1;
 
-
-  var dataArray = results;
   //(num results * rectheight + numresults*yPosScale) + overhead
-  rectCanvasHeight = results.length*(rectHeight + yPosScale)  ;
+  rectCanvasHeight = results.getResults().length*(rectHeight + yPosScale);
+  // console.log('in bar' + results.length);
+  var max = findMax(results.getResults());
   rectCanvasWidth = max*rectWidthScale + max * rectWidthScale * .5;
 
   //adding SVG shapes, 1) make canvas 2) add shape
@@ -57,15 +56,15 @@ function barCharts()
   .attr("height", rectCanvasHeight)
   .attr("align","center");
 
-  //bar chat!!!!!!
+  //bar chart!!!!!!
 
   var bars = rectCanvas.selectAll("rect")
   //bars are rectangles, since there are no rectangles on our page
   //this variable returns an empty selection (array)
-  .data(dataArray) //binds our dataArray to an empty selection of rectangles
+  .data(results.getResults()) //binds our dataArray to an empty selection of rectangles
   .enter() //returns a selection of  placeholders for each data element
   .append("rect") //for each data element we append a rectangle
-  .attr("width", function(d){ return d[indexNumericalData]*rectWidthScale;})
+  .attr("width", function(d){ return d.getMatchPosition()*rectWidthScale;})
   //makes width of EACH rectangle depend on the data in the array
   //in this case each input is the output, so our rects will be of width 20, 40, 50
   .attr("height", rectHeight)
@@ -81,12 +80,13 @@ function barCharts()
 //Pie Charts
 function piCharts()
 {
-  var data = new Array(results.results.length); //need to be this size for for loop below
+  var max = findMax(results.results, results.results.length);
+  var data = []; //need to be this size for for loop below
 
-  for (i = 0; i < results.results.length; i++)
+  for (item of results.results)
   {
     // console.log(results[i][1])
-    data[i] = results.get(i).getMatchPosition();
+    data.push(item.getMatchPosition());
   }
 
   var r = 200;

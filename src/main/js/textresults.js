@@ -57,10 +57,9 @@ function processData(data)
 
 function showResultSet() {
     $("#results").empty();
-    alert(JSON.stringify(results, null, 2));
+    var query = results.getQuery();
     for(i = 0;i<results.results.length;i++) {
         var result = results.get(i);
-        var query = results.getQuery();
         var position = result.getMatchPosition();
         var formattedString = result.getTextValue().substring(0, position) + "<b>" + 
             result.getTextValue().substring(position, position + query.getQuery().length) + 
@@ -68,6 +67,7 @@ function showResultSet() {
         formattedString += "<br><br>";
         $("#results").append(formattedString);
     }
+    console.log("FileContent = " + fileContentCount);
 }
 
 function getData(URL) {
@@ -91,6 +91,6 @@ function getResults() {
     getData(URL);
 }
 
-function dothings() {
+function doThings() {
     getResults();
 }

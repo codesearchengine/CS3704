@@ -3,10 +3,13 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     concat: {
-      dist: {
-        src: ["lib/FileSaver.js", "src/main/js/Query.js", "src/main/js/Result.js", "src/main/js/ResultList.js", "src/main/js/textresults.js", "src/main/js/visualize.js",
-        "src/main/js/import.js", "src/main/js/export.js"],
+      main: {
+        src: ["lib/*.js", "src/main/js/*.js"],
         dest: "build/project.js"
+      },
+      test: {
+        src: ["lib/*.js", "src/main/js/*.js", "src/test/js/test.js"],
+        dest: "build/tests.js"
       }
     },
     uglify: {
@@ -14,13 +17,19 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'build/project.js',
-        dest: 'build/project.min.js'
+        main: {
+          src: 'build/project.js',
+          dest: 'build/project.min.js'
+        },
+        test: {
+          src: 'build/tests.js',
+          dest: 'build/tests.min.js'
+        }
       }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.registerTask('default', ['concat', 'uglify']);
+  grunt.registerTask('default', ['concat:main', 'concat:test']);
 };

@@ -10,6 +10,7 @@ ResultList.prototype.clear = function() {
 ResultList.prototype.add = function(result) {
     if(result instanceof Result) {
         this.results.push(result);
+        return this;
     }
     else {
         throw "Can only add Result objects.";
@@ -37,6 +38,14 @@ ResultList.prototype.getQuery = function() {
 
 ResultList.prototype.setQuery = function(query) {
     this.query = query;
+}
+
+ResultList.prototype.getResults = function() {
+    return this.results;
+}
+
+ResultList.prototype.setResults = function(results) {
+    this.results = results;
 }
 
 ResultList.prototype.parse = function(json) {
