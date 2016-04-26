@@ -67,11 +67,10 @@ function showResultSet() {
         formattedString += "<br><br>";
         $("#results").append(formattedString);
     }
-    console.log("FileContent = " + fileContentCount);
 }
 
 function getData(URL) {
-    $.ajax({
+    return $.ajax({
         url: URL,
         headers: {'Accept': 'application/vnd.github.v3.text-match+json'},
         complete: function(xhr) {
@@ -84,11 +83,8 @@ function getResults() {
     var query = new Query().setRepo($('#repo').val()).setQuery($('#query').val());
     results.setQuery(query);
     var URL = "https://api.github.com/search/code?q=" + query.getQuery() + "+repo:" + query.getRepo();
-    // for testing: https://api.github.com/search/code?q=signal+repo:torvalds/linux
-    // NOTE: this url ^ won't get the text-matches since the header isn't set if you
-    // simply access the url via a browser. Must set header via JQuery.
-    // console.log(URL);
     getData(URL);
+
 }
 
 function doThings() {

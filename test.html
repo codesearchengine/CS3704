@@ -4,14 +4,15 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<title>QUnit Example</title>
-	<link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.23.1.css">
+	<link rel="stylesheet" href="stylesheets/qunit.css">
 </head>
 <body>
 	<input type="file" id="fileSelect"></input>
+	<input id="repo" type="text" style="display:none" value="torvalds/linux"></input>
+	<input id="query" type="text" style="display:none" value="signal"></input>
 	<div id="qunit"></div>
 	<div id="qunit-fixture"></div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	<script src="https://code.jquery.com/qunit/qunit-1.23.1.js"></script>
 	<script src="build/tests.js"></script>
 
 </body>
