@@ -1,27 +1,24 @@
-
-function visualize(results, le)
+function visualize()
 {
-  findMax(results, le);
+  findMax();
   clearCanvas();
   $("#V").fadeOut(1);
   $("#V").fadeIn(1500);
-  barCharts(results, le);
-  piCharts(results);
+  barCharts();
+  piCharts();
 }
 
-
-function findMax(arr, le)
+var max;
+function findMax()
 {
-  var max;
   max = -1;
-  for (i = 0; i < le; i++)
+  for (i = 0; i < results.length; i++)
   {
-    if (arr[i][1] > max)
+    if (results[i][1] > max)
     {
-      max = arr[i][1];
+      max = results[i][1];
     }
   }
-  return max;
 }
 
 function clearCanvas()
@@ -30,15 +27,11 @@ function clearCanvas()
   //  rectCanvas = ""; //to prevent old rectangles from living...search script then head
   d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
   d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
-
-  console.log(d3.select("svg").length);
-  if (d3.select("svg").length> 0) return true;
-  else return false;
 }
 
 
 
-function barCharts(results, le)
+function barCharts()
 {
   //alert('in barCharts()!');
   //var dataArray = [20, 40, 50];
@@ -53,9 +46,7 @@ function barCharts(results, le)
 
   var dataArray = results;
   //(num results * rectheight + numresults*yPosScale) + overhead
-  rectCanvasHeight = le*(rectHeight + yPosScale);
-  // console.log('in bar' + le);
-  var max = findMax(results, le);
+  rectCanvasHeight = results.length*(rectHeight + yPosScale)  ;
   rectCanvasWidth = max*rectWidthScale + max * rectWidthScale * .5;
 
   //adding SVG shapes, 1) make canvas 2) add shape
@@ -67,7 +58,6 @@ function barCharts(results, le)
 
   //bar chat!!!!!!
 
-  var bars = "";
   var bars = rectCanvas.selectAll("rect")
   //bars are rectangles, since there are no rectangles on our page
   //this variable returns an empty selection (array)
@@ -82,28 +72,17 @@ function barCharts(results, le)
   .attr("y", function(d, i) {return i*yPosScale;})
   .text("poo")
   .attr("fill", "red")
-  .attr("transform", "translate(0, 50)");
-
-  alert(bars.data.length);
-  if (bars.data.length > 0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  .attr("transform", "translate(0, 50)")
   //i = index of element, so now each bar will start below one another
   //  .attr("y", function(d, i) {return i*100;}; //i = index of element}
 }
 
 //Pie Charts
-function piCharts(results)
+function piCharts()
 {
-  var max = findMax(results, le);
-  var data = new Array(le); //need to be this size for for loop below
+  var data = new Array(results.length); //need to be this size for for loop below
 
-  for (i = 0; i < le; i++)
+  for (i = 0; i < results.length; i++)
   {
     // console.log(results[i][1])
     data[i] = results[i][1];
@@ -167,14 +146,4 @@ function piCharts(results)
   .attr("text-anchor", "middle") //centers it better
   .attr("font-size", ".6em")
   .text(function(d){ return d.data;});
-
-
-  if (arcs.data.length > 0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
 }

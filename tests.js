@@ -2,7 +2,7 @@
 //   assert.ok( 1 == "1", "Passed!" );
 // });
 
-test("test Max", function(){
+test("findMax test", function(){
   // var visualObj= createVisual();
   // alert('testing!');
   var arr = [[2, 4], [3, 6], [5,1]];
@@ -10,15 +10,33 @@ test("test Max", function(){
   // alert(max);
   ok(6 == max);
 
+  arr = [[3, 7], [10, 6], [5,21]];
+  var max = findMax(arr, arr.length);
+  // alert(max);
+  ok(21 == max);
 });
 
-test("visalAdded", function(){
+test("piCharts test", function(){
 
-  if ( $( "#svg" ).length ) {
+  var r = [[2,3], [3,6], [4,5]];
+  ok(true == piCharts(r));
+  var s = [[5,8], [3,62], [4,15]];
+ok(true == piCharts(s));
+});
 
-    $( "#myDiv" ).show();
+test("barCharts test", function(){
 
-}
-  ok(6 == max);
+  var r = [[2,3], [3,6], [4,5]];
+  ok(true == barCharts(r));
+
+    var s = [[5,8], [3,62], [4,15]];
+  ok(true == barCharts(s));
+
+});
+
+test("clearCanvas test", function(){
+
+  ok(true == clearCanvas());
+
 
 });
