@@ -49,15 +49,18 @@ ResultList.prototype.setResults = function(results) {
 }
 
 ResultList.prototype.parse = function(json) {
-    this.results = [];
+    tempResults = [];
+    tempQuery = undefined;
     try {
         var temp = JSON.parse(json);
         for(item of temp.results) {
-            this.results.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
+            tempResults.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
         }
-        this.query = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
+        tempQuery = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
     }
     catch (SyntaxError) {
-        alert("File could not be parsed as a valid result set.");
+        throw "File could not be parsed as a valid result set.";
     }
+    this.results = tempResults;
+    this.query = tempQuery;
 }

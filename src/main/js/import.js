@@ -4,8 +4,12 @@ var fileSelectChange = function(evnt) {
     evnt.stopPropagation();
     evnt.preventDefault();
     if(evnt.target.files[0]) {
-        reader.readAsText(evnt.target.files[0], "utf-8");
+    	readFile(evnt.target.files[0]);
     }
+}
+
+var readFile = function(file) {
+	reader.readAsText(file, "utf-8");
 }
 
 var importResults = function() {

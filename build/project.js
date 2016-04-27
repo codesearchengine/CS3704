@@ -284,9 +284,12 @@ if (typeof module !== "undefined" && module.exports) {
   });
 }
 
-var exportResults = function() {
+var exportResults = function(openDialog = true) {
     var blob = new Blob([JSON.stringify(results, null, 2)], {type: "application/json"});
-    saveAs(blob, "resultSet.json");
+   	if(openDialog === true) {
+   		saveAs(blob, "resultSet.json");
+   	}
+   	return blob;
 }
 var reader = new FileReader();
 
@@ -294,8 +297,12 @@ var fileSelectChange = function(evnt) {
     evnt.stopPropagation();
     evnt.preventDefault();
     if(evnt.target.files[0]) {
-        reader.readAsText(evnt.target.files[0], "utf-8");
+    	readFile(evnt.target.files[0]);
     }
+}
+
+var readFile = function(file) {
+	reader.readAsText(file, "utf-8");
 }
 
 var importResults = function() {
@@ -446,17 +453,20 @@ ResultList.prototype.setResults = function(results) {
 }
 
 ResultList.prototype.parse = function(json) {
-    this.results = [];
+    tempResults = [];
+    tempQuery = undefined;
     try {
         var temp = JSON.parse(json);
         for(item of temp.results) {
-            this.results.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
+            tempResults.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
         }
-        this.query = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
+        tempQuery = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
     }
     catch (SyntaxError) {
-        alert("File could not be parsed as a valid result set.");
+        throw "File could not be parsed as a valid result set.";
     }
+    this.results = tempResults;
+    this.query = tempQuery;
 }
 
 var results = new ResultList();

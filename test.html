@@ -7,9 +7,10 @@
 	<link rel="stylesheet" href="stylesheets/qunit.css">
 </head>
 <body>
-	<input type="file" id="fileSelect"></input>
+	<input type="file" id="fileSelect" style="display:none"></input>
 	<input id="repo" type="text" style="display:none" value="torvalds/linux"></input>
 	<input id="query" type="text" style="display:none" value="signal"></input>
+	<button type="button" id="export" onclick="exportResults()" style="display:none"></button>
 	<div id="qunit"></div>
 	<div id="qunit-fixture"></div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>

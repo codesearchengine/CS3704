@@ -4623,9 +4623,12 @@ QUnit.diff = ( function() {
 
 }() );
 
-var exportResults = function() {
+var exportResults = function(openDialog = true) {
     var blob = new Blob([JSON.stringify(results, null, 2)], {type: "application/json"});
-    saveAs(blob, "resultSet.json");
+   	if(openDialog === true) {
+   		saveAs(blob, "resultSet.json");
+   	}
+   	return blob;
 }
 var reader = new FileReader();
 
@@ -4633,8 +4636,12 @@ var fileSelectChange = function(evnt) {
     evnt.stopPropagation();
     evnt.preventDefault();
     if(evnt.target.files[0]) {
-        reader.readAsText(evnt.target.files[0], "utf-8");
+    	readFile(evnt.target.files[0]);
     }
+}
+
+var readFile = function(file) {
+	reader.readAsText(file, "utf-8");
 }
 
 var importResults = function() {
@@ -4785,17 +4792,20 @@ ResultList.prototype.setResults = function(results) {
 }
 
 ResultList.prototype.parse = function(json) {
-    this.results = [];
+    tempResults = [];
+    tempQuery = undefined;
     try {
         var temp = JSON.parse(json);
         for(item of temp.results) {
-            this.results.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
+            tempResults.push(new Result().setResultType(item.resultType).setMatchPosition(item.matchPosition).setTextValue(item.textValue).setUrlString(item.urlString));
         }
-        this.query = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
+        tempQuery = new Query().setQuery(temp.query.query).setRepo(temp.query.repo);
     }
     catch (SyntaxError) {
-        alert("File could not be parsed as a valid result set.");
+        throw "File could not be parsed as a valid result set.";
     }
+    this.results = tempResults;
+    this.query = tempQuery;
 }
 
 var results = new ResultList();
@@ -5040,6 +5050,7 @@ function piCharts()
   .attr("font-size", ".6em")
   .text(function(d){ return d.data;});
 }
+// Begin the Objects module of tests.
 QUnit.module("Objects")
 
 // Ensures that Query objects are created as expected.
@@ -5170,7 +5181,7 @@ QUnit.moduleStart(function(details) {
   }
 });
 
-// Define setup and teardown methods for the AJAX module of tests.
+// Begin the AJAX module of tests, and define setup and teardown methods.
 QUnit.module("AJAX", {
   beforeEach: function(assert) {
     results = new ResultList();
@@ -5184,7 +5195,7 @@ QUnit.module("AJAX", {
 QUnit.test("Test getData", function(assert){
   var done1 = assert.async();
   $(document).ajaxComplete(function() {
-    assert.equal(fileContentCount, 1);
+    assert.equal(fileContentCount, 1, "Parses a FileContent result.");
     done1();
   });
   results.setQuery(new Query().setQuery("signal").setRepo("torvalds/linux"));
@@ -5227,3 +5238,294 @@ QUnit.test("test noRedirect", function(assert){
     done4();
   });
 });
+
+// Begin the import and export module of tests.
+QUnit.module("Import/Export", {
+  beforeEach: function(assert) {
+    results = new ResultList();
+  }
+});
+
+// Ensures that ResultList's parse method properly parses JSON and converts it to Query and Result objects.
+QUnit.test("Correctly parse proper JSON.", function(assert) {
+  results.parse('{"results": [{"resultType": "FileContent","textValue": "#include <asm-generic/signal.h>\\n", "matchPosition": 22, "urlString": "https://github.com"}], "query": { "query": "signal", "repo": "torvalds/linux"}}');
+  assert.notEqual(results.getResults(), undefined, "Result list is not null after import.");
+  assert.equal(results.getResults().length, 1, "Result list has the right number of items in it.");
+  var result = results.getResults()[0];
+  assert.equal(result.getResultType(), "FileContent", "Result type is correct.");
+  assert.equal(result.getTextValue(), "#include &lt;asm-generic/signal.h&gt;\n", "Result text is correct.");
+  assert.equal(result.getMatchPosition(), 25, "Result match position is correct.");
+  assert.equal(result.getUrlString(), "https://github.com", "Result url is correct.");
+  assert.equal(results.getQuery().getQuery(), "signal", "Query string is correct.");
+  assert.equal(results.getQuery().getRepo(), "torvalds/linux", "Query repo is correct.");
+});
+
+// Ensures that the import functionality fails properly when the given JSON is improperly formatted.
+QUnit.test("Fail on improper JSON.", function(assert) {
+  results.setQuery(new Query().setQuery("codesearch").setRepo("codesearchengine/CS3704"));
+  results.add(new Result().setResultType("FileContent").setMatchPosition(6).setTextValue("01234 codesearch 56").setUrlString("https://github.com"));
+  assert.throws(function() {
+      results.parse('{"results": [{"resultType": "FileContent}]}')
+    },
+    "Throws an error on invalid JSON.");
+  assert.throws(function() {
+      results.parse('{"results": [{"resultType": "FileContent", "textValue": "#include <asm-generic/signal.h>\\n"}], "query": {"query": "signal"}}')
+    },
+    "Throws an error on JSON that can't be converted properly.");
+  assert.equal(results.getQuery().getQuery(), "codesearch", "Query is unchanged by failed parse.");
+  assert.equal(results.getResults().length, 1, "Results list is unchanged by failed parse.");
+});
+
+// Ensures that the export functionality works as intended.
+QUnit.test("Export success.", function(assert) {
+  results.setQuery(new Query().setQuery("query").setRepo("someperson/randomrepo"));
+  results.add(new Result().setResultType("FileContent").setMatchPosition(2).setTextValue("1 query 2").setUrlString("about:blank"));
+  var blob = exportResults(false);
+  assert.equal(blob.type, "application/json", "File blob is of the correct type.");
+});
+
+QUnit.module("Use Case", {
+  beforeEach: function(assert) {
+    results = new ResultList();
+    results.setQuery(new Query().setQuery("signal").setRepo("torvalds/linux"));
+    results.add(new Result().setResultType("FileContent").setMatchPosition(22).setTextValue("#include <asm-generic/signal.h>\n").setUrlString("https://api.github.com/repositories/2325298/contents/arch/microblaze/include/uapi/asm/signal.h?ref=9256d5a308c95a50c6e85d682492ae1f86a70f9b"));
+  }
+});
+
+// Run through the export file use case as best we can. We can't do some things that
+// would normally be the job of the user (saving file), but we can do everything else.
+QUnit.test("Export file.", function(assert) {
+  var blob = exportResults();
+  assert.equal(blob.type, "application/json", "File blob is created, and is of the correct type. SaveAs method is from an imported library, and is assumed to have worked correctly.");
+});
+
+// Run through the import file use case as best we can. We can't do some things that
+// would normally be the job of the user (choose file), but we can do everything else.
+QUnit.test("Import file", function(assert) {
+  var done5 = assert.async();
+  results = new ResultList();
+  var blob = new Blob(['{"results": [{"resultType": "FileContent","textValue": "#include <asm-generic/signal.h>", "matchPosition": 22, "urlString": "https://github.com"}], "query": { "query": "signal", "repo": "torvalds/linux"}}'], {type: 'application/json'});
+  readFile(blob);
+  reader.onloadend = function(evnnt) {
+    assert.equal(results.getResults().length, 1, "ResultsList object was altered.");
+    done5();
+  }
+});
+
+QUnit.module("Visualize");
+
+QUnit.test("findMax test", function(assert) {
+  // var visualObj= createVisual();
+  // alert('testing!');
+  var arr = [[2, 4], [3, 6], [5,1]];
+  var max = findMax(arr, arr.length);
+  // alert(max);
+  assert.equal(6, max);
+
+  arr = [[3, 7], [10, 6], [5,21]];
+  var max = findMax(arr, arr.length);
+  // alert(max);
+  assert.equal(21, max);
+});
+
+QUnit.test("piCharts test", function(assert){
+
+  var r = [[2,3], [3,6], [4,5]];
+  assert.equal(true, piCharts(r, r.length));
+//   var s = [[5,8], [3,62], [4,15]];
+// ok(true == piCharts(s));
+});
+
+QUnit.test("barCharts test", function(assert){
+
+  var r = [[2,3], [3,6], [4,5]];
+  assert.equal(true, barCharts(r));
+
+  var s = [[5,8], [3,62], [4,15]];
+  assert.equal(true, barCharts(s));
+
+});
+
+QUnit.test("clearCanvas test", function(assert){
+  assert.equal(true, clearCanvas());
+});
+
+function visualize(results, le)
+{
+  findMax(results, le);
+  clearCanvas();
+  $("#V").fadeOut(1);
+  $("#V").fadeIn(1500);
+  barCharts(results, le);
+  piCharts(results);
+}
+
+
+function findMax(arr, le)
+{
+  var max;
+  max = -1;
+  for (i = 0; i < le; i++)
+  {
+    if (arr[i][1] > max)
+    {
+      max = arr[i][1];
+    }
+  }
+  return max;
+}
+
+function clearCanvas()
+{
+  //Remove : do for as many times you generate charts
+  //  rectCanvas = ""; //to prevent old rectangles from living...search script then head
+  d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
+  d3.select("svg").remove(); //clear the canvas so we don't keep appending stuff
+
+  console.log(d3.select("svg").length);
+  if (d3.select("svg").length> 0) return true;
+  else return false;
+}
+
+
+
+function barCharts(results, le)
+{
+  //alert('in barCharts()!');
+  //var dataArray = [20, 40, 50];
+  //  var dataArray = [20, 10];
+  var rectCanvasHeight; //global so you can output in console
+  var rectCanvas;
+  var rectWidthScale = 10;
+  var rectHeight = 25;
+  var yPosScale = 50; //index * yPosScale ...to represent spacing between rects
+  var indexNumericalData = 1;
+
+
+  var dataArray = results;
+  //(num results * rectheight + numresults*yPosScale) + overhead
+  rectCanvasHeight = le*(rectHeight + yPosScale);
+  // console.log('in bar' + le);
+  var max = findMax(results, le);
+  rectCanvasWidth = max*rectWidthScale + max * rectWidthScale * .5;
+
+  //adding SVG shapes, 1) make canvas 2) add shape
+  var rectCanvas = d3.select("visualization")
+  .append("svg")
+  .attr("width", rectCanvasWidth) //note these are css elements, use attr for SVG CANVAS
+  .attr("height", rectCanvasHeight)
+  .attr("align","center");
+
+  //bar chat!!!!!!
+
+  var bars = "";
+  var bars = rectCanvas.selectAll("rect")
+  //bars are rectangles, since there are no rectangles on our page
+  //this variable returns an empty selection (array)
+  .data(dataArray) //binds our dataArray to an empty selection of rectangles
+  .enter() //returns a selection of  placeholders for each data element
+  .append("rect") //for each data element we append a rectangle
+  .attr("width", function(d){ return d[indexNumericalData]*rectWidthScale;})
+  //makes width of EACH rectangle depend on the data in the array
+  //in this case each input is the output, so our rects will be of width 20, 40, 50
+  .attr("height", rectHeight)
+  .attr("x", 10)
+  .attr("y", function(d, i) {return i*yPosScale;})
+  .text("poo")
+  .attr("fill", "red")
+  .attr("transform", "translate(0, 50)");
+
+//  alert(bars.data.length);
+  if (bars.data.length > 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+  //i = index of element, so now each bar will start below one another
+  //  .attr("y", function(d, i) {return i*100;}; //i = index of element}
+}
+
+//Pie Charts
+function piCharts(results, le)
+{
+  var max = findMax(results, le);
+  var data = new Array(le); //need to be this size for for loop below
+
+  for (i = 0; i < le; i++)
+  {
+    // console.log(results[i][1])
+    data[i] = results[i][1];
+  }
+
+  var r = 200;
+
+
+  //oridinal means the input might not be a continious domain
+  var color = d3.scale.ordinal()
+  .domain([0, max*2]) //*2 to scale better
+  .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+  var canvas = d3.select("visualization").append("svg") //TODO: visualization or body?
+  .attr("width", 410)
+  .attr("height", 410);
+
+  var group = canvas.append("g")
+  .attr("transform", "translate(200, 200)");
+
+
+  //Donut chart code:
+  // var arc = d3.svg.arc() //arc path generator (see tutorial 12)
+  // .innerRadius(r-100)
+  // .outerRadius(r);
+
+  //Pie chart code:
+  var arc = d3.svg.arc() //arc path generator (see tutorial 12)
+  .innerRadius(0)
+  .outerRadius(r);
+
+  //to invoke pie we do pie()
+  var pie = d3.layout.pie()
+  .value(function(d){ return d;});
+
+  var arcs = group.selectAll(".arc") //select everything that is of class "arc"
+  .data(pie(data)) //bind our data to the selection,
+  // but pass it through the pie layout (returns an object with start and end angle)
+  .enter() //so we don't need a for loop
+  //Returns the enter selection: placeholder nodes for each data element for
+  //which no corresponding existing DOM element was found in the current selection
+  .append("g") //appends group for each data element
+  .attr("class", "arc"); //see notes at 1) for what happens at this point in the console...
+  //each data element has had an arc path generated
+
+  arcs.append("path") //appends a path to each data element
+  .attr("d", arc)
+  //d  being an element in the array
+  // will fetch the path data from the arc path generator (inner and outer radius)
+  //and the arc generator will also get the start and end angle from .data(pie(data))
+  .attr("fill", function(d){ return color(d.data);}); //d.data being the value of the array element
+  //d[1].data vs d[1]??? TODO -----------------
+
+  //moving the whole thing to a position:
+  arcs.attr("transform", "translate(0, 0)");
+
+  //appending text to each arc
+  arcs.append("text")
+  .attr("transform", function(d){ return "translate(" + arc.centroid(d) +")";})
+  //centroid returns the center of each arc in our data
+  .attr("text-anchor", "middle") //centers it better
+  .attr("font-size", ".6em")
+  .text(function(d){ return d.data;});
+
+
+  if (arcs.data.length > 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
